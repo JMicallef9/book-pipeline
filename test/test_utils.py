@@ -86,7 +86,40 @@ class TestFetchBooksByAuthor:
 
         for item in result:
             assert isinstance(item, dict)
+    
+    def test_returns_correct_data(self, mock_get_request):
+        """Checks that correct data is returned."""
+        result = fetch_books_by_author("url", "name")
 
-        print(result)
+        assert len(result) == 2
+        assert result[0]["title"] == "The Handmaid's Tale"
+        assert result[1]["title"] == "The Blind Assassin"
+        
+        for item in result:
+            assert list(item.keys()) == [
+                "author_key",
+                "author_name",
+                "cover_edition_key",
+                "cover_i",
+                "ebook_access",
+                "edition_count",
+                "first_publish_year",
+                "has_fulltext",
+                "ia",
+                "ia_collection_s",
+                "key",
+                "language",
+                "lending_edition_s",
+                "lending_identifier_s",
+                "public_scan_b",
+                "title"
+            ]
+        
+            assert isinstance(item["author_key"], list)
+            assert isinstance(item["edition_count"], int)
+            assert isinstance(item["has_fulltext"], bool)
+            assert item["author_name"] == ['Margaret Atwood']
+
+
 
 
