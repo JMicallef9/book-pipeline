@@ -8,6 +8,7 @@ def mock_get_request():
     """Creates a test response body."""
     with patch("requests.get") as mock_get:
         response = Mock()
+        response.raise_for_status.return_value = None
         response.json.return_value = {
             "numFound": 2428,
             "start": 0,
@@ -73,7 +74,7 @@ def mock_get_request():
             ]
         }
         mock_get.return_value = response
-        yield
+        yield mock_get
 
 
 class TestFetchBooksByAuthor:
@@ -120,6 +121,10 @@ class TestFetchBooksByAuthor:
             assert isinstance(item["has_fulltext"], bool)
             assert item["author_name"] == ['Margaret Atwood']
 
-
+    def test_raise_for_status_called(self, mock_get_request):
+        """Checks that status check is performed."""
+        fetch_books_by_author("url", "name")
+        mock_get_request.return_value.raise_for_status.assert_called_once()
+        
 
 
