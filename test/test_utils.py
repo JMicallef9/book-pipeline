@@ -1,6 +1,7 @@
 from src.utils import fetch_books_by_author
 import pytest
 from unittest.mock import patch, Mock
+import requests
 
 
 @pytest.fixture
@@ -125,6 +126,20 @@ class TestFetchBooksByAuthor:
         """Checks that status check is performed."""
         fetch_books_by_author("url", "name")
         mock_get_request.return_value.raise_for_status.assert_called_once()
-        
+    
+    @pytest.mark.parametrize(
+        "side_effect,expected_exception", [
+            (requests.exceptions.HTTPError("404 Client Error"), requests.exceptions.HTTPError),
+            (requests.exceptions.ConnectionError("Failed to connect"), requests.exceptions.ConnectionError),
+            (requests.exceptions.Timeout("Request timed out"), requests.exceptions.Timeout),
+        ]
+    )
+    def test_correct_errors_raised(self, side_effect, expected_exception):
+        """Checks that errors are raised."""
+        with patch("requests.get") as mock_get:
+            mock_response = Mock()
+            mock_response.raise_for_status.side_effect = side_effect
+            mock_get.return_value = mock_response
 
-
+            with pytest.raises(expected_exception):
+                fetch_books_by_author("url", "name")
