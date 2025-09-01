@@ -209,6 +209,10 @@ def dummy_book_list():
 class TestUpdateBookList:
     """Tests for the update_book_list function."""
 
+    def test_returns_new_list(self, dummy_book_list):
+        """Checks that a new list is returned."""
+
+
     def test_returns_correctly_updated_data(self, dummy_book_list):
         """Checks that correct data is returned."""
         result = update_book_list(dummy_book_list)
@@ -235,3 +239,27 @@ class TestUpdateBookList:
             "eng",
             "fin"
         ]
+    
+    def test_updates_with_empty_lists_if_keys_missing(self, dummy_book_list):
+        """Checks that empty lists are included if keys missing."""
+        dummy_list = dummy_book_list
+
+        keys_to_remove = ["author_name", "first_publish_year", "language"]
+
+        for key in keys_to_remove:
+            dummy_list[0].pop(key)
+        
+        result = update_book_list(dummy_list)
+
+        assert list(result[0].keys()) == [
+                "id",
+                "title",
+                "author_name",
+                "first_publish_year",
+                "edition_count",
+                "language"
+            ]
+        
+        assert result[0]["author_name"] == []
+        assert result[0]["first_publish_year"] == []
+        assert result[0]["language"] == []
