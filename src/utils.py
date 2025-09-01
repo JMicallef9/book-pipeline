@@ -1,6 +1,16 @@
 import requests
 
 def fetch_books_by_author(name, url):
+    """
+    Fetches a list of books from the openlibrary API.
+    
+    Args:
+        name (str): The name of an author.
+        url (str): An openlibrary URL.
+    
+    Returns:
+        list: A list of dictionaries with information about the author's books. 
+    """
     url = f"{url}/search.json?author={name}"
     response = requests.get(url)
     response.raise_for_status()
@@ -8,6 +18,15 @@ def fetch_books_by_author(name, url):
     return data["docs"]
 
 def update_book_list(book_list):
+    """
+    Simplifies a list of books and updates relevant data.
+
+    Args:
+        book_list (list): A list of dictionaries containing information about books.
+    
+    Returns:
+        list: A new list of books with updated key-value pairs.
+    """
     book_details = []
     for book in book_list:
         book_dict = {}
