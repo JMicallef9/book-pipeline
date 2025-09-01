@@ -211,6 +211,9 @@ class TestUpdateBookList:
 
     def test_returns_new_list(self, dummy_book_list):
         """Checks that a new list is returned."""
+        result = update_book_list(dummy_book_list)
+
+        assert result is not dummy_book_list
 
 
     def test_returns_correctly_updated_data(self, dummy_book_list):
@@ -242,14 +245,12 @@ class TestUpdateBookList:
     
     def test_updates_with_empty_lists_if_keys_missing(self, dummy_book_list):
         """Checks that empty lists are included if keys missing."""
-        dummy_list = dummy_book_list
-
         keys_to_remove = ["author_name", "first_publish_year", "language"]
 
         for key in keys_to_remove:
-            dummy_list[0].pop(key)
+            dummy_book_list[0].pop(key)
         
-        result = update_book_list(dummy_list)
+        result = update_book_list(dummy_book_list)
 
         assert list(result[0].keys()) == [
                 "id",

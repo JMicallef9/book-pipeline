@@ -32,10 +32,10 @@ def update_book_list(book_list):
         book_dict = {}
         book_dict["id"] = book["key"]
         book_dict["title"] = book["title"]
-        book_dict["author_name"] = book.get(["author_name"], [])
-        book_dict["first_publish_year"] = book.get(["first_publish_year"], [])
+        book_dict["author_name"] = book.get("author_name", [])
+        book_dict["first_publish_year"] = book.get("first_publish_year", [])
         book_dict["edition_count"] = book["edition_count"]
-        book_dict["language"] = book.get(["language"], [])
+        book_dict["language"] = book.get("language", [])
         book_details.append(book_dict)
     
     return book_details
