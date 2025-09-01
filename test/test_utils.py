@@ -1,4 +1,4 @@
-from src.utils import fetch_books_by_author
+from src.utils import fetch_books_by_author, update_book_list
 import pytest
 from unittest.mock import patch, Mock
 import requests
@@ -143,3 +143,95 @@ class TestFetchBooksByAuthor:
 
             with pytest.raises(expected_exception):
                 fetch_books_by_author("url", "name")
+
+
+@pytest.fixture
+def dummy_book_list():
+    """Creates a dummy book list."""
+    dummy_list = [
+        {
+            "author_key": ["OL52922A"],
+            "author_name": ["Margaret Atwood"],
+            "cover_edition_key": "OL2769393M",
+            "cover_i": 8231851,
+            "ebook_access": "borrowable",
+            "edition_count": 147,
+            "first_publish_year": 1985,
+            "has_fulltext": True,
+            "ia": [
+                "handmaidstale0000atwo_n4n6",
+                "handmaidstale2006atwo",
+                "handmaidstale00atwo_2"
+            ],
+            "ia_collection_s": "goffstownlibrary",
+            "key": "/works/OL675783W",
+            "language": [
+                "rum",
+                "eng",
+                "fin"
+            ],
+            "lending_edition_s": "OL38231252M",
+            "lending_identifier_s": "rasskazsluzhanki0000atwo_y8j3",
+            "public_scan_b": False,
+            "title": "The Handmaid's Tale"
+        },
+        {
+            "author_key": ["OL52922A"],
+            "author_name": ["Margaret Atwood"],
+            "cover_edition_key": "OL18632021M",
+            "cover_i": 11041760,
+            "ebook_access": "borrowable",
+            "edition_count": 89,
+            "first_publish_year": 2000,
+            "has_fulltext": True,
+            "ia": [
+                "letueuraveugle0000atwo",
+                "letueuraveuglero0000atwo",
+                "blindassassin0000atwo_j4u3",
+                "blindassassin0000atwo_u6w1"
+            ],
+            "ia_collection_s": "inlibrary",
+            "key": "/works/OL675698W",
+            "language": [
+                "heb",
+                "ben",
+                "eng"
+            ],
+            "lending_edition_s": "OL37790601M",
+            "lending_identifier_s": "letueuraveugle0000atwo",
+            "public_scan_b": False,
+            "title": "The Blind Assassin"
+        }
+    ]
+    yield dummy_list
+
+
+class TestUpdateBookList:
+    """Tests for the update_book_list function."""
+
+    def test_returns_correctly_updated_data(self, dummy_book_list):
+        """Checks that correct data is returned."""
+        result = update_book_list(dummy_book_list)
+
+        assert len(result) == 2
+
+        for book in result:
+            assert list(book.keys()) == [
+                "id",
+                "title",
+                "author_name",
+                "first_publish_year",
+                "edition_count",
+                "language"
+            ]
+        
+        assert result[0]["id"] == "/works/OL675783W"
+        assert result[0]["title"] == "The Handmaid's Tale"
+        assert result[0]["author_name"] == ["Margaret Atwood"]
+        assert result[0]["first_publish_year"] == 1985
+        assert result[0]["edition_count"] == 147
+        assert result[0]["language"] == [
+            "rum",
+            "eng",
+            "fin"
+        ]
