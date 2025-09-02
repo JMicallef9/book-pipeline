@@ -56,7 +56,7 @@ def fetch_book_subjects(book_key, url):
     response.raise_for_status()
     data = response.json()
     book_dict = {}
-    book_dict["subjects"] = data.get(["subjects"], [])
+    book_dict["subjects"] = data.get("subjects", [])
     return book_dict
 
 def fetch_isbn_and_publisher_data(edition_key, url):
