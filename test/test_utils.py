@@ -264,3 +264,9 @@ class TestUpdateBookList:
         assert result[0]["author_name"] == []
         assert result[0]["first_publish_year"] == []
         assert result[0]["language"] == []
+    
+    def test_empty_book_list_returns_empty_list(self):
+        """Checks empty list is returned if book list is empty."""
+        result = update_book_list([])
+
+        assert result == []
