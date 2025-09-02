@@ -41,6 +41,16 @@ def update_book_list(book_list):
     return book_details
 
 def fetch_book_subjects(book_key, url):
+    """
+    Retrieves the list of subjects for a book.
+    
+    Args:
+        url (str): The main openlibrary URL.
+        book_key (str): The openlibrary key for a book.
+    
+    Returns:
+        dict: A dictionary listing the book's subjects.
+    """
     url = f"{url}{book_key}.json"
     response = requests.get(url)
     response.raise_for_status()
