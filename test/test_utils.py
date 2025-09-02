@@ -1,4 +1,4 @@
-from src.utils import fetch_books_by_author, update_book_list
+from src.utils import fetch_books_by_author, update_book_list, fetch_book_subjects
 import pytest
 from unittest.mock import patch, Mock
 import requests
@@ -270,3 +270,96 @@ class TestUpdateBookList:
         result = update_book_list([])
 
         assert result == []
+
+
+@pytest.fixture
+def mock_subject_request():
+    """Creates a subjects response body."""
+    with patch("requests.get") as mock_get:
+        response = Mock()
+        response.raise_for_status.return_value = None
+        response.json.return_value = {
+            "covers": [
+                4860886, 
+                4860885, 
+                766204, 
+                6878094, 
+                6948267, 
+                8764937, 
+                10312346, 
+                10447585, 
+                11549236, 
+                9415891, 
+                12808715
+            ], 
+            "key": "/works/OL675737W", 
+            "authors": [
+                {
+                    "author": {
+                        "key": "/authors/OL52922A"
+                    }, 
+                    "type": {
+                        "key": "/type/author_role"
+                    }
+                }
+            ], 
+            "title": "The Penelopiad", 
+            "subjects": [
+                "Penelope (Greek mythology)", 
+                "Odysseus (Greek mythology)", 
+                "Fiction", 
+                "Canadian fiction (fictional works by one author)", 
+                "P\u00e9n\u00e9lope (Mythologie grecque)", 
+                "Romans, nouvelles", 
+                "Ulysse (Mythologie grecque)", 
+                "English literature", 
+                "Fiction, general", 
+                "Greece, fiction", 
+                "Fiction, fantasy, general", 
+                "feminist retelling", 
+                "parallel novel"
+            ], 
+            "type": {
+                "key": "/type/work"
+            }, 
+            "description": "Homer's Odyssey is not the only version of the story.",
+            "latest_revision": 18, 
+            "revision": 18, 
+            "created": {
+                "type": "/type/datetime", 
+                "value": "2009-12-09T01:02:43.882811"
+            }, 
+            "last_modified": {
+                "type": "/type/datetime", 
+                "value": "2024-09-23T14:42:30.367966"
+            }
+        }
+        mock_get.return_value = response
+        yield mock_get
+
+
+class TestFetchBookSubjects:
+    """Tests for the fetch_book_subjects function."""
+
+    def test_raise_for_status_called(self, mock_subject_request):
+        """Checks that status check is performed."""
+        fetch_book_subjects("url", "/works/OL675783W")
+        mock_subject_request.return_value.raise_for_status.assert_called_once()
+    
+    @pytest.mark.parametrize(
+        "side_effect,expected_exception", [
+            (requests.exceptions.HTTPError("404 Client Error"), requests.exceptions.HTTPError),
+            (requests.exceptions.ConnectionError("Failed to connect"), requests.exceptions.ConnectionError),
+            (requests.exceptions.Timeout("Request timed out"), requests.exceptions.Timeout),
+        ]
+    )
+    def test_correct_errors_raised(self, side_effect, expected_exception):
+        """Checks that errors are raised."""
+        with patch("requests.get") as mock_get:
+            mock_response = Mock()
+            mock_response.raise_for_status.side_effect = side_effect
+            mock_get.return_value = mock_response
+
+            with pytest.raises(expected_exception):
+                fetch_book_subjects("url", "/works/OL675783W")
+
