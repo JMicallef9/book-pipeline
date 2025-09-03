@@ -280,16 +280,7 @@ def mock_subject_request():
         response.json.return_value = {
             "covers": [
                 4860886, 
-                4860885, 
-                766204, 
-                6878094, 
-                6948267, 
-                8764937, 
-                10312346, 
-                10447585, 
-                11549236, 
-                9415891, 
-                12808715
+                4860885
             ], 
             "key": "/works/OL675737W", 
             "authors": [
@@ -306,17 +297,7 @@ def mock_subject_request():
             "subjects": [
                 "Penelope (Greek mythology)", 
                 "Odysseus (Greek mythology)", 
-                "Fiction", 
-                "Canadian fiction (fictional works by one author)", 
-                "P\u00e9n\u00e9lope (Mythologie grecque)", 
-                "Romans, nouvelles", 
-                "Ulysse (Mythologie grecque)", 
-                "English literature", 
-                "Fiction, general", 
-                "Greece, fiction", 
-                "Fiction, fantasy, general", 
-                "feminist retelling", 
-                "parallel novel"
+                "Fiction"
             ], 
             "type": {
                 "key": "/type/work"
@@ -361,4 +342,15 @@ class TestFetchBookSubjects:
 
             with pytest.raises(expected_exception):
                 fetch_book_subjects("url", "/works/OL675783W")
+    
+    def test_returns_correct_data(self, mock_subject_request):
+        """Checks correct data is returned."""
+        result = fetch_book_subjects("url", "/works/OL675783W")
+        assert isinstance(result, dict)
+        assert list(result.keys()) == ["subjects"]
+        assert result["subjects"] == [
+            "Penelope (Greek mythology)",
+            "Odysseus (Greek mythology)",
+            "Fiction"
+        ]
 
