@@ -9,7 +9,6 @@ def mock_get_request():
     """Creates a test response body."""
     with patch("requests.get") as mock_get:
         response = Mock()
-        response.raise_for_status.return_value = None
         response.json.return_value = {
             "numFound": 2428,
             "start": 0,
