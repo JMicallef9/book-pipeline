@@ -468,4 +468,23 @@ class TestFetchISBNandPublisherData:
             "isbn_13": ["9780771008139"]
         } 
 
+    def test_returns_empty_lists_for_missing_isbn_numbers(self, mock_edition_request):
+        """Checks empty list is returned in place of missing ISBN."""
+
+        keys_to_remove = ["isbn_10", "isbn_13"]
+        for key in keys_to_remove:
+            mock_edition_request.return_value.json.return_value.pop(key)
+
+        result = fetch_isbn_and_publisher_data("OL2769393M", "url")
+
+        assert list(result.keys()) == ["publisher", "isbn"]
+        assert result["publisher"] == [
+            "McClelland & Stewart",
+            "McClelland and Stewart"
+        ]
+        assert result["isbn"] == {
+            "isbn_10": [], 
+            "isbn_13": []
+        } 
+
 
