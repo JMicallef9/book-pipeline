@@ -454,4 +454,18 @@ class TestFetchISBNandPublisherData:
 
             with pytest.raises(expected_exception):
                 fetch_isbn_and_publisher_data("OL2769393M", "url")
+    
+    def test_returns_correct_data(self, mock_edition_request):
+        """Checks that correct data is returned."""
+        result = fetch_isbn_and_publisher_data("OL2769393M", "url")
+        assert list(result.keys()) == ["publisher", "isbn"]
+        assert result["publisher"] == [
+            "McClelland & Stewart",
+            "McClelland and Stewart"
+        ]
+        assert result["isbn"] == {
+            "isbn_10": ["0771008139"], 
+            "isbn_13": ["9780771008139"]
+        } 
+
 
