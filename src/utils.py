@@ -77,8 +77,8 @@ def fetch_isbn_and_publisher_data(edition_key, url):
     book_dict = {}
     book_dict["publisher"] = data["publishers"]
     book_dict["isbn"] = {
-        ["isbn_10"]: data.get(["isbn_10"], []),
-        ["isbn_13"]: data.get(["isbn_13"], [])
+        "isbn_10": data.get("isbn_10", []),
+        "isbn_13": data.get("isbn_13", [])
     }
     return book_dict
 

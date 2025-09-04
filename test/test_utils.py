@@ -1,4 +1,4 @@
-from src.utils import fetch_books_by_author, update_book_list, fetch_book_subjects
+from src.utils import fetch_books_by_author, update_book_list, fetch_book_subjects, fetch_isbn_and_publisher_data
 import pytest
 from unittest.mock import patch, Mock
 import requests
@@ -82,7 +82,7 @@ class TestFetchBooksByAuthor:
 
     def test_returns_list_of_dicts(self, mock_get_request):
         """Checks that a list of dictionaries is returned."""
-        result = fetch_books_by_author("url", "name")
+        result = fetch_books_by_author("name", "url")
         assert isinstance(result, list)
 
         for item in result:
@@ -90,7 +90,7 @@ class TestFetchBooksByAuthor:
     
     def test_returns_correct_data(self, mock_get_request):
         """Checks that correct data is returned."""
-        result = fetch_books_by_author("url", "name")
+        result = fetch_books_by_author("name", "url")
 
         assert len(result) == 2
         assert result[0]["title"] == "The Handmaid's Tale"
@@ -123,7 +123,7 @@ class TestFetchBooksByAuthor:
 
     def test_raise_for_status_called(self, mock_get_request):
         """Checks that status check is performed."""
-        fetch_books_by_author("url", "name")
+        fetch_books_by_author("name", "url")
         mock_get_request.return_value.raise_for_status.assert_called_once()
     
     @pytest.mark.parametrize(
@@ -141,7 +141,7 @@ class TestFetchBooksByAuthor:
             mock_get.return_value = mock_response
 
             with pytest.raises(expected_exception):
-                fetch_books_by_author("url", "name")
+                fetch_books_by_author("name", "url")
 
 
 @pytest.fixture
@@ -276,7 +276,6 @@ def mock_subject_request():
     """Creates a subjects response body."""
     with patch("requests.get") as mock_get:
         response = Mock()
-        response.raise_for_status.return_value = None
         response.json.return_value = {
             "covers": [
                 4860886, 
@@ -323,7 +322,7 @@ class TestFetchBookSubjects:
 
     def test_raise_for_status_called(self, mock_subject_request):
         """Checks that status check is performed."""
-        fetch_book_subjects("url", "/works/OL675783W")
+        fetch_book_subjects("/works/OL675783W", "url")
         mock_subject_request.return_value.raise_for_status.assert_called_once()
     
     @pytest.mark.parametrize(
@@ -341,11 +340,11 @@ class TestFetchBookSubjects:
             mock_get.return_value = mock_response
 
             with pytest.raises(expected_exception):
-                fetch_book_subjects("url", "/works/OL675783W")
+                fetch_book_subjects("/works/OL675783W", "url")
     
     def test_returns_correct_data(self, mock_subject_request):
         """Checks correct data is returned."""
-        result = fetch_book_subjects("url", "/works/OL675783W")
+        result = fetch_book_subjects("/works/OL675783W", "url")
         assert isinstance(result, dict)
         assert list(result.keys()) == ["subjects"]
         assert result["subjects"] == [
@@ -353,4 +352,106 @@ class TestFetchBookSubjects:
             "Odysseus (Greek mythology)",
             "Fiction"
         ]
+
+
+@pytest.fixture
+def mock_edition_request():
+    """Creates an edition key response body."""
+    with patch("requests.get") as mock_get:
+        response = Mock()
+        response.json.return_value = {
+            "description": {
+                "type": "/type/text", 
+                "value": "The Handmaid's Tale is a radical departure for Margaret Atwood."
+            }, 
+            "identifiers": {
+                "librarything": ["1667444"], 
+                "alibris_id": ["9780771008139"]
+            }, 
+            "title": "The Handmaid's Tale",
+            "authors": [{"key": "/authors/OL52922A"}], 
+            "publish_date": "1985", 
+            "publishers": [
+                "McClelland & Stewart",
+                "McClelland and Stewart"
+            ], 
+            "covers": [8231851], 
+            "physical_format": "Hardcover", 
+            "publish_places": ["Toronto, Canada"], 
+            "uri_descriptions": [
+                "Contributor biographical information", 
+                "Publisher description"
+            ], 
+            "pagination": "324 p. ;", 
+            "source_records": [
+                "promise:bwb_daily_pallets_2022-09-01:W7-CMU-382",
+                "marc:marc_records_scriblio_net/part18.dat:195613967:911"
+            ], 
+            "url": [
+                "http://www.loc.gov/catdir/bios/random056/86129018.html", 
+                "http://www.loc.gov/catdir/description/random0411/86129018.html"
+            ], 
+            "languages": [{"key": "/languages/eng"}], 
+            "subjects": [
+                "Man-woman relationships -- Fiction", 
+                "Misogyny -- Fiction", "Women -- Fiction"
+            ], 
+            "publish_country": "onc", 
+            "copyright_date": "1985", 
+            "by_statement": "Margaret Atwood.", 
+            "type": {"key": "/type/edition"}, 
+            "uris": [
+                "http://www.loc.gov/catdir/bios/random056/86129018.html", 
+                "http://www.loc.gov/catdir/description/random0411/86129018.html"
+            ], 
+            "ocaid": "handmaidstale00marg", 
+            "isbn_10": ["0771008139"], 
+            "isbn_13": ["9780771008139"], 
+            "lccn": ["86129018"], 
+            "dewey_decimal_class": ["813/.54"], 
+            "lc_classifications": [
+                "PR9199.3.A8 H3 1985", 
+                "PR9501 .T86N35 1985"
+            ], 
+            "local_id": ["urn:bwbsku:W7-CMU-382", "urn:bwbsku:P7-EDL-594"], 
+            "key": "/books/OL2769393M", 
+            "number_of_pages": 324, 
+            "works": [{"key": "/works/OL675783W"}], 
+            "oclc_numbers": ["12825460"], 
+            "latest_revision": 28, 
+            "revision": 28, 
+            "created": {"type": "/type/datetime", "value": "2008-04-01T03:28:50.625462"}, 
+            "last_modified": {
+                "type": "/type/datetime", 
+                "value": "2024-07-21T21:40:12.749893"
+            }
+        }
+        mock_get.return_value = response
+        yield mock_get
+
+
+class TestFetchISBNandPublisherData:
+    """Tests for the fetch_isbn_and_publisher_data function."""
+
+    def test_raise_for_status_called(self, mock_edition_request):
+        """Checks that status check is performed."""
+        fetch_isbn_and_publisher_data("OL2769393M", "url")
+        mock_edition_request.return_value.raise_for_status.assert_called_once()
+    
+    @pytest.mark.parametrize(
+        "side_effect,expected_exception", [
+            (requests.exceptions.HTTPError("404 Client Error"), requests.exceptions.HTTPError),
+            (requests.exceptions.ConnectionError("Failed to connect"), requests.exceptions.ConnectionError),
+            (requests.exceptions.Timeout("Request timed out"), requests.exceptions.Timeout),
+        ]
+    )
+    def test_correct_errors_raised(self, side_effect, expected_exception):
+        """Checks that errors are raised."""
+        with patch("requests.get") as mock_get:
+            mock_response = Mock()
+            mock_response.raise_for_status.side_effect = side_effect
+            mock_get.return_value = mock_response
+
+            with pytest.raises(expected_exception):
+                fetch_isbn_and_publisher_data("OL2769393M", "url")
 
