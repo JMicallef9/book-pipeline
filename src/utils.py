@@ -60,6 +60,16 @@ def fetch_book_subjects(book_key, url):
     return book_dict
 
 def fetch_isbn_and_publisher_data(edition_key, url):
+    """
+    Retrieves a book's ISBN and publisher data.
+    
+    Args:
+        edition_key (str): A book's edition key.
+        url (str): An openlibrary URL.
+    
+    Returns:
+        dict: The book's ISBN and publisher data.
+    """
     url = f"{url}/books/{edition_key}.json"
     response = requests.get(url)
     response.raise_for_status()
