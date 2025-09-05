@@ -82,5 +82,14 @@ def fetch_isbn_and_publisher_data(edition_key, url):
     }
     return book_dict
 
-def get_cover_edition_key(book):
-    return book.get("cover_edition_key") or (book.get("edition_key", [None])[0])
+def get_edition_key(book):
+    """
+    Retrieves a book's edition key.
+
+    Args:
+        book (dict): A dictionary representing a book.
+
+    Returns:
+        str: The book's edition key.
+    """
+    return book.get("cover_edition_key") or (book.get("lending_edition_s"))
