@@ -1,4 +1,4 @@
-from src.utils import fetch_books_by_author, update_book_list, fetch_book_subjects, fetch_isbn_and_publisher_data
+from src.utils import fetch_books_by_author, update_book_list, fetch_book_subjects, fetch_isbn_and_publisher_data, get_edition_key
 import pytest
 from unittest.mock import patch, Mock
 import requests
@@ -487,4 +487,46 @@ class TestFetchISBNandPublisherData:
             "isbn_13": []
         } 
 
+@pytest.fixture
+def book_data_example():
+    """A dummy book dictionary with a cover edition key."""
+    book = {
+        "author_key": [
+            "OL52922A"
+        ],
+        "author_name": [
+            "Margaret Atwood"
+        ],
+        "cover_edition_key": "OL18632021M",
+        "title": "The Blind Assassin"
+    }
+    yield book
 
+class TestGetEditionKey:
+    """Tests for the get_edition_key function."""
+
+    def test_returns_cover_edition_key(self, book_data_example):
+        """Checks that cover_edition_key is returned."""
+        result = get_edition_key(book_data_example)
+
+        assert result == "OL18632021M"
+    
+    def test_returns_lending_edition_key(self, book_data_example):
+        """Checks that lending_edition key is returned."""
+        book_data_example.pop("cover_edition_key")
+        book_data_example["lending_edition_s"] = "OL7038266M"
+
+        result = get_edition_key(book_data_example)
+
+        assert result == "OL7038266M"
+    
+    def test_returns_none_if_no_edition_key(self, book_data_example):
+        """Checks None is returned if no edition key."""
+        book_data_example.pop("cover_edition_key")
+
+        result = get_edition_key(book_data_example)
+
+        assert result == None
+
+
+        
