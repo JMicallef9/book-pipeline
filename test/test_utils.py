@@ -545,3 +545,16 @@ class TestMergeDicts:
             "c": 3,
             "d": 4
         }
+    
+    def test_retains_values_of_duplicate_key(self):
+        """Checks that values of duplicate keys are not discarded."""
+        dict1 = {"a": 1, "b": 2}
+        dict2 = {"a": 3, "d": 4}
+
+        result = merge_dicts(dict1, dict2)
+
+        assert result == {
+            "a": [1, 3],
+            "b": 2,
+            "d": 4
+        }
