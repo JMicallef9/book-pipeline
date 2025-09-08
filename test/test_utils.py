@@ -558,3 +558,17 @@ class TestMergeDicts:
             "b": 2,
             "d": 4
         }
+    
+    def test_ignores_duplicate_values(self):
+        """Checks that duplicate values are ignored."""
+
+        dict1 = {"a": "duplicate_title", "b": 1}
+        dict2 = {"a": "duplicate_title", "c": 100}
+
+        result = merge_dicts(dict1, dict2)
+
+        assert result == {
+            "a": "duplicate_title",
+            "b": 1,
+            "c": 100
+        }

@@ -111,7 +111,7 @@ def merge_dicts(*dictionaries):
             if key not in new_dict:
                 new_dict[key] = value
             else:
-                if not isinstance(new_dict[key], list):
+                if not isinstance(new_dict[key], list) and value is not new_dict[key]:
                     new_dict[key] = [new_dict[key]]
                     new_dict[key].append(value)
     
