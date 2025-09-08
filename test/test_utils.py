@@ -572,3 +572,19 @@ class TestMergeDicts:
             "b": 1,
             "c": 100
         }
+    
+    def test_merges_more_than_two_dicts(self):
+        """Checks that more than two dicts are merged."""
+
+        dict1 = {"a": "duplicate_title", "b": 1}
+        dict2 = {"a": "duplicate_title", "c": 100}
+        dict3 = {"f": 150, "c": "new_value"}
+
+        result = merge_dicts(dict1, dict2, dict3)
+
+        assert result == {
+            "a": "duplicate_title",
+            "b": 1,
+            "c": [100, "new_value"],
+            "f": 150
+        }
