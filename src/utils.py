@@ -93,3 +93,22 @@ def get_edition_key(book):
         str: The book's edition key.
     """
     return book.get("cover_edition_key") or (book.get("lending_edition_s"))
+
+def merge_dicts(*dictionaries):
+    """
+    Merges multiple dictionaries into single dictionary.
+
+    Args:
+        dictionaries (dict): Two or more dictionaries.
+    
+    Returns:
+        dict: A merged dictionary.
+    """
+    new_dict = {}
+
+    for d in dictionaries:
+        for key, value in d.items():
+            if key not in new_dict:
+                new_dict[key] = value
+    
+    return new_dict

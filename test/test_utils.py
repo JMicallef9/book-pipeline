@@ -1,4 +1,4 @@
-from src.utils import fetch_books_by_author, update_book_list, fetch_book_subjects, fetch_isbn_and_publisher_data, get_edition_key
+from src.utils import fetch_books_by_author, update_book_list, fetch_book_subjects, fetch_isbn_and_publisher_data, get_edition_key, merge_dicts
 import pytest
 from unittest.mock import patch, Mock
 import requests
@@ -529,4 +529,19 @@ class TestGetEditionKey:
         assert result == None
 
 
-        
+class TestMergeDicts:
+    """Tests for the merge_dicts function."""
+
+    def test_merges_two_dicts(self):
+        """Checks two dictionaries are successfully merged."""
+        dict1 = {"a": 1, "b": 2}
+        dict2 = {"c": 3, "d": 4}
+
+        result = merge_dicts(dict1, dict2)
+
+        assert result == {
+            "a": 1,
+            "b": 2,
+            "c": 3,
+            "d": 4
+        }
