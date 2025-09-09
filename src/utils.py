@@ -131,22 +131,20 @@ def generate_book_data(author, url):
     """
     book_list = fetch_books_by_author(author, url)
 
-    edition_keys = []
+    new_book_list = []
 
     for book in book_list:
-        edition_keys.append(get_edition_key(book))
+
+        edition_key = get_edition_key(book)
     
         updated_book = update_book_data(book)
 
+        subjects = fetch_book_subjects(updated_book["id"], url)
 
+        isbn_data = fetch_isbn_and_publisher_data(edition_key, url)
+
+        new_dict = merge_dicts(updated_book, subjects, isbn_data)
+
+        new_book_list.append(new_dict)
     
-
-
-
-
-# fetch_books_by_author
-# get edition key
-# pass each book through update_book_list
-# use key to fetch book subjects
-# use edition key to fetch isbn/publisher data
-# merge dicts
+    return new_book_list
