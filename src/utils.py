@@ -136,7 +136,7 @@ def generate_book_data(author, url):
     for book in book_list:
         edition_keys.append(get_edition_key(book))
     
-    updated_books = update_book_list(book_list)
+        updated_book = update_book_data(book)
 
 
     

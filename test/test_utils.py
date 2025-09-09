@@ -1,4 +1,12 @@
-from src.utils import fetch_books_by_author, update_book_list, fetch_book_subjects, fetch_isbn_and_publisher_data, get_edition_key, merge_dicts
+from src.utils import (
+    fetch_books_by_author,
+    update_book_data,
+    fetch_book_subjects,
+    fetch_isbn_and_publisher_data,
+    get_edition_key,
+    merge_dicts,
+    generate_book_data
+)
 import pytest
 from unittest.mock import patch, Mock
 import requests
@@ -145,113 +153,81 @@ class TestFetchBooksByAuthor:
 
 
 @pytest.fixture
-def dummy_book_list():
-    """Creates a dummy book list."""
-    dummy_list = [
-        {
-            "author_key": ["OL52922A"],
-            "author_name": ["Margaret Atwood"],
-            "cover_edition_key": "OL2769393M",
-            "cover_i": 8231851,
-            "ebook_access": "borrowable",
-            "edition_count": 147,
-            "first_publish_year": 1985,
-            "has_fulltext": True,
-            "ia": [
-                "handmaidstale0000atwo_n4n6",
-                "handmaidstale2006atwo",
-                "handmaidstale00atwo_2"
-            ],
-            "ia_collection_s": "goffstownlibrary",
-            "key": "/works/OL675783W",
-            "language": [
-                "rum",
-                "eng",
-                "fin"
-            ],
-            "lending_edition_s": "OL38231252M",
-            "lending_identifier_s": "rasskazsluzhanki0000atwo_y8j3",
-            "public_scan_b": False,
-            "title": "The Handmaid's Tale"
-        },
-        {
-            "author_key": ["OL52922A"],
-            "author_name": ["Margaret Atwood"],
-            "cover_edition_key": "OL18632021M",
-            "cover_i": 11041760,
-            "ebook_access": "borrowable",
-            "edition_count": 89,
-            "first_publish_year": 2000,
-            "has_fulltext": True,
-            "ia": [
-                "letueuraveugle0000atwo",
-                "letueuraveuglero0000atwo",
-                "blindassassin0000atwo_j4u3",
-                "blindassassin0000atwo_u6w1"
-            ],
-            "ia_collection_s": "inlibrary",
-            "key": "/works/OL675698W",
-            "language": [
-                "heb",
-                "ben",
-                "eng"
-            ],
-            "lending_edition_s": "OL37790601M",
-            "lending_identifier_s": "letueuraveugle0000atwo",
-            "public_scan_b": False,
-            "title": "The Blind Assassin"
-        }
-    ]
-    yield dummy_list
+def dummy_book_dict():
+    """Creates a dummy book dictionary."""
+    dummy_data = {
+        "author_key": ["OL52922A"],
+        "author_name": ["Margaret Atwood"],
+        "cover_edition_key": "OL2769393M",
+        "cover_i": 8231851,
+        "ebook_access": "borrowable",
+        "edition_count": 147,
+        "first_publish_year": 1985,
+        "has_fulltext": True,
+        "ia": [
+            "handmaidstale0000atwo_n4n6",
+            "handmaidstale2006atwo",
+            "handmaidstale00atwo_2"
+        ],
+        "ia_collection_s": "goffstownlibrary",
+        "key": "/works/OL675783W",
+        "language": [
+            "rum",
+            "eng",
+            "fin"
+        ],
+        "lending_edition_s": "OL38231252M",
+        "lending_identifier_s": "rasskazsluzhanki0000atwo_y8j3",
+        "public_scan_b": False,
+        "title": "The Handmaid's Tale"
+    }
+    yield dummy_data
 
 
-class TestUpdateBookList:
-    """Tests for the update_book_list function."""
+class TestUpdateBookData:
+    """Tests for the update_book_data function."""
 
-    def test_returns_new_list(self, dummy_book_list):
+    def test_returns_new_dict(self, dummy_book_dict):
         """Checks that a new list is returned."""
-        result = update_book_list(dummy_book_list)
+        result = update_book_data(dummy_book_dict)
 
-        assert result is not dummy_book_list
+        assert result is not dummy_book_dict
 
 
-    def test_returns_correctly_updated_data(self, dummy_book_list):
+    def test_returns_correctly_updated_data(self, dummy_book_dict):
         """Checks that correct data is returned."""
-        result = update_book_list(dummy_book_list)
+        result = update_book_data(dummy_book_dict)
 
-        assert len(result) == 2
-
-        for book in result:
-            assert list(book.keys()) == [
-                "id",
-                "title",
-                "author_name",
-                "first_publish_year",
-                "edition_count",
-                "language"
-            ]
+        assert list(result.keys()) == [
+            "id",
+            "title",
+            "author_name",
+            "first_publish_year",
+            "edition_count",
+            "language"
+        ]
         
-        assert result[0]["id"] == "/works/OL675783W"
-        assert result[0]["title"] == "The Handmaid's Tale"
-        assert result[0]["author_name"] == ["Margaret Atwood"]
-        assert result[0]["first_publish_year"] == 1985
-        assert result[0]["edition_count"] == 147
-        assert result[0]["language"] == [
+        assert result["id"] == "/works/OL675783W"
+        assert result["title"] == "The Handmaid's Tale"
+        assert result["author_name"] == ["Margaret Atwood"]
+        assert result["first_publish_year"] == 1985
+        assert result["edition_count"] == 147
+        assert result["language"] == [
             "rum",
             "eng",
             "fin"
         ]
     
-    def test_updates_with_empty_lists_if_keys_missing(self, dummy_book_list):
+    def test_updates_with_empty_lists_if_keys_missing(self, dummy_book_dict):
         """Checks that empty lists are included if keys missing."""
         keys_to_remove = ["author_name", "first_publish_year", "language"]
 
         for key in keys_to_remove:
-            dummy_book_list[0].pop(key)
+            dummy_book_dict.pop(key)
         
-        result = update_book_list(dummy_book_list)
+        result = update_book_data(dummy_book_dict)
 
-        assert list(result[0].keys()) == [
+        assert list(result.keys()) == [
                 "id",
                 "title",
                 "author_name",
@@ -260,15 +236,15 @@ class TestUpdateBookList:
                 "language"
             ]
         
-        assert result[0]["author_name"] == []
-        assert result[0]["first_publish_year"] == []
-        assert result[0]["language"] == []
+        assert result["author_name"] == []
+        assert result["first_publish_year"] == []
+        assert result["language"] == []
     
-    def test_empty_book_list_returns_empty_list(self):
+    def test_empty_book_dict_returns_empty_dict(self):
         """Checks empty list is returned if book list is empty."""
-        result = update_book_list([])
+        result = update_book_data({})
 
-        assert result == []
+        assert result == {}
 
 
 @pytest.fixture
@@ -588,3 +564,9 @@ class TestMergeDicts:
             "c": [100, "new_value"],
             "f": 150
         }
+
+
+# class TestGenerateBookData:
+#     """Tests for the generate_book_data function."""
+
+#     def test_generates_data_for_single_book(self, mock_get_request):
