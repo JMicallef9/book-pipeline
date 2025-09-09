@@ -94,7 +94,7 @@ def get_edition_key(book):
     """
     return book.get("cover_edition_key") or (book.get("lending_edition_s"))
 
-def merge_dicts(*dictionaries):
+def merge_dicts(*dicts):
     """
     Merges multiple dictionaries into single dictionary.
 
@@ -106,7 +106,7 @@ def merge_dicts(*dictionaries):
     """
     new_dict = {}
 
-    for d in dictionaries:
+    for d in dicts:
         for key, value in d.items():
             if key not in new_dict:
                 new_dict[key] = value
