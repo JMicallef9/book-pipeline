@@ -17,28 +17,29 @@ def fetch_books_by_author(name, url):
     data = response.json()
     return data["docs"]
 
-def update_book_list(book_list):
+def update_book_data(book_data):
     """
-    Simplifies a list of books and updates relevant data.
+    Simplifies and updates book data.
 
     Args:
-        book_list (list): A list of dictionaries containing information about books.
+        book_data (dict): A dictionary containing information about a book.
     
     Returns:
-        list: A new list of books with updated key-value pairs.
+        dict: A streamlined set of data with updated key-value pairs.
     """
-    book_details = []
-    for book in book_list:
-        book_dict = {}
-        book_dict["id"] = book["key"]
-        book_dict["title"] = book["title"]
-        book_dict["author_name"] = book.get("author_name", [])
-        book_dict["first_publish_year"] = book.get("first_publish_year", [])
-        book_dict["edition_count"] = book["edition_count"]
-        book_dict["language"] = book.get("language", [])
-        book_details.append(book_dict)
+    book_dict = {}
+
+    if not book_data:
+        return book_dict
+
+    book_dict["id"] = book_data["key"]
+    book_dict["title"] = book_data["title"]
+    book_dict["author_name"] = book_data.get("author_name", [])
+    book_dict["first_publish_year"] = book_data.get("first_publish_year", [])
+    book_dict["edition_count"] = book_data["edition_count"]
+    book_dict["language"] = book_data.get("language", [])
     
-    return book_details
+    return book_dict
 
 def fetch_book_subjects(book_key, url):
     """
@@ -116,3 +117,36 @@ def merge_dicts(*dicts):
                     new_dict[key].append(value)
     
     return new_dict
+
+def generate_book_data(author, url):
+    """
+    Retrieves and formats data for an author's books.
+
+    Args:
+        name (str): The name of an author.
+        url (str): An openlibrary URL.
+    
+    Returns:
+        list: A list of pipeline-ready data about the author's books. 
+    """
+    book_list = fetch_books_by_author(author, url)
+
+    edition_keys = []
+
+    for book in book_list:
+        edition_keys.append(get_edition_key(book))
+    
+    updated_books = update_book_list(book_list)
+
+
+    
+
+
+
+
+# fetch_books_by_author
+# get edition key
+# pass each book through update_book_list
+# use key to fetch book subjects
+# use edition key to fetch isbn/publisher data
+# merge dicts
